@@ -15,15 +15,18 @@ DATA_TAB_4 = '\t\t\t\t   '
 
 
 def main():
-    # conn = socket.socket(socket.AF_INET,socket.SOCK_RAW,socket.ntohs(3))
-    conn = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
-    conn.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
+    #conn = socket.socket(socket.AF_INET, socket.SOCK_RAW, 3)
+    #conn = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
+    #conn.bind(("127.0.0.1", 65535))
+    #conn.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+    #conn.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
     while True:
         raw_data, addr = conn.recvfrom(65536)
         dest_mac, src_mac, eth_proto, data = ethernet_frame(raw_data)
         print('\nEthernet Frame: ')
-        print('Destination: {},Source: {}, Protocol: {}'.format_map(dest_mac, src_mac, eth_proto))
+        print(TAB_1 + 'Destination: {}, Source: {}, Protocol: {}'.format(dest_mac, src_mac, eth_proto))
 
         # 8 for IPv4
         if eth_proto == 8:
@@ -41,7 +44,7 @@ def main():
                 print(format_output_line(DATA_TAB_3, data))
 
             # TCP
-            elif ipv4.proto == 6:
+            elif proto == 6:
                 src_port, dest_port, sequence, acknowledgment, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin = struct.unpack(
                     '! H H L L H H H H H H', raw_data[:24])
                 print(TAB_1 + 'TCP Segment:')
@@ -141,3 +144,4 @@ def format_output_line(prefix, string, size=80):
 
 
 main()
+
