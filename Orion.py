@@ -3,6 +3,19 @@ import textwrap
 import socket
 from email.policy import HTTP
 
+#GUI
+from tkinter import *
+
+root = Tk()
+#root.geometry("1920x1080")
+bottomFrame = Frame(root)
+bottomFrame.pack(side=BOTTOM)
+background_image=PhotoImage(file="Wallpapers_1920x1080.png")
+background_label = Label(root, image=background_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
+background_label.pack()
+#frame.grid_propagate(0)
+
 TAB_1 = '\t - '
 TAB_2 = '\t\t - '
 TAB_3 = '\t\t\t - '
@@ -13,8 +26,11 @@ DATA_TAB_2 = '\t\t   '
 DATA_TAB_3 = '\t\t\t   '
 DATA_TAB_4 = '\t\t\t\t   '
 
+def pause():
+    print("paused...")
 
-def main():
+def sniffer():
+    print("started...")
     conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
     #conn = socket.socket(socket.AF_INET, socket.SOCK_RAW, 3)
     #conn = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
@@ -85,6 +101,14 @@ def main():
                 print(format_output_line(DATA_TAB_1, data))
 
 
+button1 = Button(root, text="Initiate",fg="Green", command=sniffer)
+button2 = Button(root, text="HALT!",fg="red", command=pause)
+button3 = Button(root, text="Exit",fg="orange", command=exit)
+button1.pack(side=LEFT)
+button2.pack(side=LEFT)
+button3.pack(side=LEFT)
+root.mainloop()
+
 def ethernet_frame(data):
     dest_mac, src_mac, proto = struct.unpack('! 6s 6s H', data[:14])
     return get_mac_addr(dest_mac), get_mac_addr(src_mac), socket.htons(proto), data[14:]
@@ -141,7 +165,4 @@ def format_output_line(prefix, string, size=80):
         if size % 2:
             size -= 1
     return '\n'.join([prefix + line for line in textwrap.wrap(string, size)])
-
-
-main()
 
